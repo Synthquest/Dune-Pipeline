@@ -7,16 +7,26 @@ from dune_client.query import QueryBase
 from datetime import datetime, timedelta
 
 def get_max_date_from_csv(csv_file):
-    # Load the CSV data into a DataFrame
-    df = pd.read_csv(csv_file)
-
-    # Convert the 'date' column to datetime objects
-    df['date'] = pd.to_datetime(df['date'])
-
-    # Find the maximum date in the 'date' column
-    max_date = df['date'].max()
-
-    return max_date, df
+    try:
+        # Load the CSV data into a DataFrame
+        df = pd.read_csv(csv_file)
+        
+        if df.empty:
+            # If the DataFrame is empty, return the default date
+            print("CSV file is empty. Defaulting to January 1st, 2000.")
+            return datetime(2000, 1, 1), df
+        
+        # Convert the 'date' column to datetime objects
+        df['date'] = pd.to_datetime(df['date'])
+        
+        # Find the maximum date in the 'date' column
+        max_date = df['date'].max()
+        
+        return max_date, df
+    except pd.errors.EmptyDataError:
+        # Handle the case where the CSV is completely empty
+        print("CSV file is completely empty. Defaulting to January 1st, 2000.")
+        return datetime(2000, 1, 1), pd.DataFrame()
 
 # Query Date with timestamp:
 csv_file = 'query_results.csv'  # Replace with your CSV file path
